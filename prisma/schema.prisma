@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Department {
+  id             BigInt       @id @default(autoincrement())
+  name           String       @db.VarChar(50)
+  code           String       @db.VarChar(20)
+  status         Boolean      @default(true) @db.Boolean
+  softDelete     Boolean      @default(true) @db.Boolean
+  createdDate    DateTime     @default(now()) @db.Timestamp()
+  Org            Organization @relation(fields: [organizationId], references: [id])
+  organizationId BigInt
+}
+
+model Organization {
+  id         BigInt       @id @default(autoincrement())
+  name       String       @db.VarChar(50)
+  status     Boolean      @default(true) @db.Boolean
+  softDelete Boolean      @default(false) @db.Boolean
+  department Department[]
+  userType   UserType[]
+  client     Client[]
+}
+
+model UserType {
+  id             BigInt       @id @default(autoincrement())
+  type           String       @db.VarChar(20)
+  status         Boolean      @default(true) @db.Boolean
+  softDelete     Boolean      @default(false) @db.Boolean
+  createdDate    DateTime     @default(now()) @db.Timestamp()
+  Org            Organization @relation(fields: [organizationId], references: [id])
+  organizationId BigInt
+}
+
+model Client {
+  id             BigInt       @id @default(autoincrement())
+  name           String       @db.VarChar(50)
+  status         Boolean      @default(true) @db.Boolean
+  softDelete     Boolean      @default(false) @db.Boolean
+  createdDate    DateTime     @default(now()) @db.Timestamp()
+  org            Organization @relation(fields: [organizationId], references: [id])
+  organizationId BigInt
+}
